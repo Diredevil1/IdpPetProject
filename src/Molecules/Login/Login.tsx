@@ -29,7 +29,7 @@ const Login = () => {
     const user = users.find((user) => user.email === email);
     if (user && user.password === password) {
       setLoggedInUser(user);
-      navigate("/layout");
+      navigate("/WorkSpace");
     } else {
       setErrorMessage("Invalid email or password");
     }

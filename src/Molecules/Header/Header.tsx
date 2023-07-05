@@ -1,11 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+// Mui
 import { Box, Typography, Button, MenuItem } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
-import useUserStore from "../../userStore";
-import { useNavigate } from "react-router-dom";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-
+// State
+import useUserStore from "../../userStore";
+// types
 import { User } from "../../userStore";
 
 interface ComponentProps {
@@ -37,12 +39,13 @@ const Header: React.FC<ComponentProps> = ({ user }) => {
   return (
     <Box
       sx={{
+        height: "3rem",
         color: "#adb5bd",
         backgroundColor: "#30324e",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        p: "8px 16px",
+        p: "0px 16px",
         boxShadow: "0px 4px 6px -4px rgba(9, 11, 25, 0.5);",
       }}
     >
