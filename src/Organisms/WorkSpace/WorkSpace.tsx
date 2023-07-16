@@ -14,7 +14,6 @@ const WorkSpace: React.FC = () => {
       <Header user={user} />
       <Box
         sx={{
-          height: "calc(100% - 3rem)",
           display: "flex",
           justifyContent: "flex-end",
           alignItems: "flex-start",
