@@ -6,7 +6,18 @@ import useUserStore from "./userStore.ts";
 
 const storedUsersData = localStorage.getItem("users");
 const initialUsersData = storedUsersData ? JSON.parse(storedUsersData) : [];
-useUserStore.setState({ users: initialUsersData });
+const globalUser = {
+  country: "USA",
+  ocupation: "Talent",
+  name: "Žygimantas",
+  surname: "Mejaras",
+  phoneNumber: 860386521,
+  password: "Kierihenri12",
+  email: "mejaras@gmail.com",
+  roles: ["Global admin"],
+};
+const mergedUsers = [globalUser, ...initialUsersData];
+useUserStore.setState({ users: mergedUsers });
 
 const storedLoggedInUserData = localStorage.getItem("loggedInUser");
 const initialLoggedInUser = storedLoggedInUserData

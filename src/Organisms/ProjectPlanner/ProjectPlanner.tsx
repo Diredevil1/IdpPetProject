@@ -16,14 +16,14 @@ import {
 } from "@mui/material";
 
 const ProjectPlanner: React.FC = () => {
-  const { addProject, projects, loggedInUser, users } = useUserStore();
+  const { addProject, projects, loggedInUser, users, setSelectedProject } =
+    useUserStore();
 
   const [tab, setTab] = useState<number>(0);
   const [inputVisible, setInputVisible] = useState<boolean>(false);
   const [projectName, setProjectName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [openModal, setOpenModal] = useState(false);
 
   const tabs = ["Projects", "Overview", "Something Else"];
@@ -32,7 +32,7 @@ const ProjectPlanner: React.FC = () => {
     setSelectedProject(project);
     setOpenModal(true);
   };
-
+  console.log(users);
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedProject(null); // Reset selected project when closing the modal
@@ -157,7 +157,9 @@ const ProjectPlanner: React.FC = () => {
                   {project.assignedUsers
                     .filter((user) => user.email === project.creatorEmail)
                     .map((user) => (
-                      <Typography>Creator: {user.name}</Typography>
+                      <Typography key={user.email}>
+                        Creator: {user.name}
+                      </Typography>
                     ))}
                 </Box>
               )),
@@ -165,7 +167,6 @@ const ProjectPlanner: React.FC = () => {
             <ProjectDetailsModal
               open={openModal}
               onClose={handleCloseModal}
-              project={selectedProject}
               currentUser={loggedInUser!}
               allUsers={users}
             />

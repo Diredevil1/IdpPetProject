@@ -22,6 +22,7 @@ interface FormData {
   phoneNumber: number;
   country: string;
   ocupation: string;
+  roles: string[];
 }
 
 const Register = () => {
@@ -43,7 +44,6 @@ const Register = () => {
 
   const onSubmit = (data: FormData) => {
     addUser(data);
-    console.log(data);
     reset();
     navigate("/");
   };

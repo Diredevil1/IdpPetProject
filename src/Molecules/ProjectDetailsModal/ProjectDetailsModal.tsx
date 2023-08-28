@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Project, User } from "../../userStore";
+import React, { useState, useEffect } from "react";
+import { User } from "../../userStore";
 import useUserStore from "../../userStore";
 
 import {
@@ -16,7 +16,6 @@ import {
 interface ProjectDetailsModalProps {
   open: boolean;
   onClose: () => void;
-  project: Project | null;
   currentUser: User;
   allUsers: User[];
 }
@@ -24,20 +23,41 @@ interface ProjectDetailsModalProps {
 const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   open,
   onClose,
-  project,
   currentUser,
   allUsers,
 }) => {
-  const { assignUserToProject } = useUserStore();
+  const {
+    assignUserToProject,
+    selectedProject,
+    setSelectedProject,
+    projects,
+    removeUserFromProject,
+  } = useUserStore();
   const [selectedUserToAdd, setSelectedUserToAdd] = useState<User | null>(null);
 
-  const isProjectCreator = project?.creatorEmail === currentUser?.email;
+  const isProjectCreator = selectedProject?.creatorEmail === currentUser?.email;
 
   const handleAddUserToProject = () => {
-    if (isProjectCreator && project && selectedUserToAdd) {
-      assignUserToProject(project.id, selectedUserToAdd);
+    if (isProjectCreator && selectedProject && selectedUserToAdd) {
+      assignUserToProject(selectedProject.id, selectedUserToAdd);
     }
   };
+
+  const handleDeleteUser = (userToDelete: User) => {
+    if (
+      selectedProject &&
+      userToDelete.email !== selectedProject.creatorEmail
+    ) {
+      removeUserFromProject(selectedProject.id, userToDelete); // Use the removeUserFromProject method
+    }
+  };
+
+  useEffect(() => {
+    const updatedProject = projects.find(
+      (project) => project.id === selectedProject?.id
+    );
+    setSelectedProject(updatedProject || null);
+  }, [projects]);
 
   const filteredUsers = allUsers.filter(
     (user) => user.email !== currentUser.email
@@ -57,15 +77,17 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
       open={open}
       onClose={onClose}
     >
-      {project && (
+      {selectedProject && (
         <>
-          <DialogTitle>{project.name}</DialogTitle>
+          <DialogTitle>{selectedProject.name}</DialogTitle>
           <DialogContent>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               {/* Left side */}
               <Box sx={{ display: "flex" }}>
-                {project.assignedUsers.map((user) => (
+                {selectedProject.assignedUsers.map((user) => (
                   <Chip
+                    onDelete={() => handleDeleteUser(user)}
+                    key={user.email}
                     label={`${user.name} ${user.surname}`}
                     sx={{ color: "orange" }}
                   />
@@ -75,7 +97,6 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               <Box>
                 {isProjectCreator && (
                   <Select
-                    displayEmpty
                     value={selectedUserToAdd?.email || ""}
                     onChange={(event) => {
                       const selectedUser = allUsers.find(
@@ -84,14 +105,18 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       setSelectedUserToAdd(selectedUser || null);
                     }}
                   >
-                    <MenuItem value="" disabled>
-                      Select User
-                    </MenuItem>
-                    {filteredUsers.map((user) => (
-                      <MenuItem key={user.email} value={user.email}>
-                        {`${user.name} ${user.surname}`}
-                      </MenuItem>
-                    ))}
+                    {filteredUsers
+                      .filter(
+                        (user) =>
+                          !selectedProject?.assignedUsers.some(
+                            (u) => u.email === user.email
+                          )
+                      )
+                      .map((user) => (
+                        <MenuItem key={user.email} value={user.email}>
+                          {`${user.name} ${user.surname}`}
+                        </MenuItem>
+                      ))}
                   </Select>
                 )}
                 <Button

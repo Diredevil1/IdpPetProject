@@ -8,6 +8,7 @@ export interface User {
   phoneNumber: number;
   country: string;
   ocupation: string;
+  roles: string[];
 }
 export interface Project {
   id: string;
@@ -24,12 +25,19 @@ interface UserStore {
   addProject: (project: Project) => void;
   assignUserToProject: (projectId: string, user: User) => void;
   removeUserFromProject: (projectId: string, user: User) => void;
+  selectedProject: Project | null;
+  setSelectedProject: (project: Project | null) => void;
 }
 
 const useUserStore = create<UserStore>((set) => ({
+  selectedProject: null,
   users: [],
   loggedInUser: null,
   projects: [],
+
+  setSelectedProject: (project) => {
+    set({ selectedProject: project });
+  },
 
   addProject: (project) =>
     set((state) => ({
@@ -67,13 +75,16 @@ const useUserStore = create<UserStore>((set) => ({
     }),
 
   addUser: (user) => {
+    const roles = ["User"];
+    const updatedUser = { ...user, roles };
+
     set((state) => ({
-      users: [...state.users, user],
+      users: [...state.users, updatedUser],
     }));
 
     localStorage.setItem(
       "users",
-      JSON.stringify([...useUserStore.getState().users, user])
+      JSON.stringify([...useUserStore.getState().users, updatedUser])
     );
   },
 
