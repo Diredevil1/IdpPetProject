@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 
 const ProjectPlanner: React.FC = () => {
-  const { addProject, projects, loggedInUser } = useUserStore();
+  const { addProject, projects, loggedInUser, users } = useUserStore();
 
   const [tab, setTab] = useState<number>(0);
   const [inputVisible, setInputVisible] = useState<boolean>(false);
@@ -51,6 +51,7 @@ const ProjectPlanner: React.FC = () => {
       id: uuidv4(),
       name: projectName!,
       assignedUsers: [loggedInUser!],
+      creatorEmail: loggedInUser!.email,
     };
 
     addProject(newProject);
@@ -60,6 +61,7 @@ const ProjectPlanner: React.FC = () => {
   };
 
   const handleTabChange = (e: React.SyntheticEvent, newTab: number) => {
+    e.defaultPrevented;
     setTab(newTab);
   };
 
@@ -136,6 +138,7 @@ const ProjectPlanner: React.FC = () => {
                     justifyContent: "center",
                     alignItems: "flex-start",
                     cursor: "pointer",
+                    transition: "0.2s",
                     "&:hover": {
                       backgroundColor: "#264653",
                       color: "#81c784",
@@ -151,9 +154,11 @@ const ProjectPlanner: React.FC = () => {
                   <Typography sx={{ color: "#81c784" }} variant="h5">
                     {project.name}
                   </Typography>
-                  <Typography>
-                    {project.assignedUsers.map((user) => user.name)}
-                  </Typography>
+                  {project.assignedUsers
+                    .filter((user) => user.email === project.creatorEmail)
+                    .map((user) => (
+                      <Typography>Creator: {user.name}</Typography>
+                    ))}
                 </Box>
               )),
             ]}
@@ -161,6 +166,8 @@ const ProjectPlanner: React.FC = () => {
               open={openModal}
               onClose={handleCloseModal}
               project={selectedProject}
+              currentUser={loggedInUser!}
+              allUsers={users}
             />
           </Box>
         ) : tab === 1 ? (

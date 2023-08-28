@@ -13,6 +13,7 @@ export interface Project {
   id: string;
   name: string;
   assignedUsers: User[];
+  creatorEmail: string;
 }
 interface UserStore {
   users: User[];
@@ -22,6 +23,7 @@ interface UserStore {
   setLoggedInUser: (user: User | null) => void;
   addProject: (project: Project) => void;
   assignUserToProject: (projectId: string, user: User) => void;
+  removeUserFromProject: (projectId: string, user: User) => void;
 }
 
 const useUserStore = create<UserStore>((set) => ({
@@ -48,14 +50,36 @@ const useUserStore = create<UserStore>((set) => ({
       return { projects: updatedProjects };
     }),
 
+  removeUserFromProject: (projectId, user) =>
+    set((state) => {
+      const updatedProjects = state.projects.map((project) =>
+        project.id === projectId
+          ? {
+              ...project,
+              assignedUsers: project.assignedUsers.filter(
+                (assignedUser) => assignedUser.email !== user.email
+              ),
+            }
+          : project
+      );
+
+      return { projects: updatedProjects };
+    }),
+
   addUser: (user) => {
     set((state) => ({
       users: [...state.users, user],
     }));
+
+    localStorage.setItem(
+      "users",
+      JSON.stringify([...useUserStore.getState().users, user])
+    );
   },
 
   setLoggedInUser: (user) => {
     set({ loggedInUser: user });
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
   },
 }));
 
