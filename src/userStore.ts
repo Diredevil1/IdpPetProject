@@ -9,12 +9,15 @@ export interface User {
   country: string;
   ocupation: string;
   roles: string[];
+  userCapacity: number;
 }
 export interface Project {
   id: string;
   name: string;
   assignedUsers: User[];
   creatorEmail: string;
+  projectCapacity: number;
+  totalUserCapacity: number;
 }
 interface UserStore {
   users: User[];
@@ -27,22 +30,43 @@ interface UserStore {
   removeUserFromProject: (projectId: string, user: User) => void;
   selectedProject: Project | null;
   setSelectedProject: (project: Project | null) => void;
+  setProjectCapacity: (projectId: string, capacity: number) => void;
 }
 
-const useUserStore = create<UserStore>((set) => ({
+const useUserStore = create<UserStore>()((set) => ({
   selectedProject: null,
   users: [],
   loggedInUser: null,
   projects: [],
 
+  setProjectCapacity: (projectId: string, capacity: number) =>
+    set((state) => {
+      const updatedProjects = state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, projectCapacity: capacity }
+          : project
+      );
+      return { projects: updatedProjects };
+    }),
+
   setSelectedProject: (project) => {
     set({ selectedProject: project });
   },
 
-  addProject: (project) =>
+  addProject: (project) => {
+    const userCapacityTotal = project.assignedUsers.reduce(
+      (sum, user) => sum + user.userCapacity,
+      0
+    );
+    const updatedProject = {
+      ...project,
+      totalUserCapacity: userCapacityTotal,
+      projectCapacity: 100,
+    };
     set((state) => ({
-      projects: [...state.projects, project],
-    })),
+      projects: [...state.projects, updatedProject],
+    }));
+  },
 
   assignUserToProject: (projectId, user) =>
     set((state) => {
@@ -51,6 +75,8 @@ const useUserStore = create<UserStore>((set) => ({
           ? {
               ...project,
               assignedUsers: [...project.assignedUsers, user],
+              totalUserCapacity:
+                project.totalUserCapacity + Number(user.userCapacity),
             }
           : project
       );
@@ -67,6 +93,7 @@ const useUserStore = create<UserStore>((set) => ({
               assignedUsers: project.assignedUsers.filter(
                 (assignedUser) => assignedUser.email !== user.email
               ),
+              totalUserCapacity: project.totalUserCapacity - user.userCapacity,
             }
           : project
       );
@@ -76,7 +103,7 @@ const useUserStore = create<UserStore>((set) => ({
 
   addUser: (user) => {
     const roles = ["User"];
-    const updatedUser = { ...user, roles };
+    const updatedUser = { ...user, roles, userCapacity: 80 };
 
     set((state) => ({
       users: [...state.users, updatedUser],

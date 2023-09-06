@@ -32,10 +32,10 @@ const ProjectPlanner: React.FC = () => {
     setSelectedProject(project);
     setOpenModal(true);
   };
-  console.log(users);
+
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedProject(null); // Reset selected project when closing the modal
+    setSelectedProject(null);
   };
 
   const handleInputVisible = () => {
@@ -52,6 +52,8 @@ const ProjectPlanner: React.FC = () => {
       name: projectName!,
       assignedUsers: [loggedInUser!],
       creatorEmail: loggedInUser!.email,
+      projectCapacity: 0,
+      totalUserCapacity: 0,
     };
 
     addProject(newProject);

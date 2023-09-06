@@ -15,6 +15,7 @@ const globalUser = {
   password: "Kierihenri12",
   email: "mejaras@gmail.com",
   roles: ["Global admin"],
+  userCapacity: 80,
 };
 const mergedUsers = [globalUser, ...initialUsersData];
 useUserStore.setState({ users: mergedUsers });
