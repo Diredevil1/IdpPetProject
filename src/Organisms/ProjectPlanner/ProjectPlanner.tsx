@@ -28,6 +28,8 @@ const ProjectPlanner: React.FC = () => {
 
   const tabs = ["Projects", "Overview", "Something Else"];
 
+  const isGlobalAdmin = loggedInUser?.roles.includes("Global admin");
+
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
     setOpenModal(true);
@@ -67,6 +69,12 @@ const ProjectPlanner: React.FC = () => {
     setTab(newTab);
   };
 
+  const relevantProjects = projects.filter(
+    (project) =>
+      loggedInUser?.roles.includes("Global admin") ||
+      project.assignedUsers.some((user) => user.email === loggedInUser?.email)
+  );
+
   return (
     <Paper
       elevation={0}
@@ -86,13 +94,16 @@ const ProjectPlanner: React.FC = () => {
           </Typography>
         )}
         <Box sx={{ display: "flex", gap: "1rem" }}>
-          <Button
-            onClick={handleInputVisible}
-            color="warning"
-            sx={{ width: "135px", ml: "1rem", mb: "0.5rem" }}
-          >
-            New project +
-          </Button>
+          {isGlobalAdmin && (
+            <Button
+              onClick={handleInputVisible}
+              color="warning"
+              sx={{ width: "135px", ml: "1rem", mb: "0.5rem" }}
+            >
+              New project +
+            </Button>
+          )}
+
           {inputVisible && (
             <Box>
               <TextField
@@ -131,40 +142,46 @@ const ProjectPlanner: React.FC = () => {
             }}
           >
             {[
-              projects.map((project) => (
-                <Box
-                  key={project.id}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "flex-start",
-                    cursor: "pointer",
-                    transition: "0.2s",
-                    "&:hover": {
-                      backgroundColor: "#264653",
-                      color: "#81c784",
-                      fontWeight: "bold",
-                      transform: "scale(1.02)",
+              relevantProjects.length > 0 ? (
+                relevantProjects.map((project) => (
+                  <Box
+                    key={project.id}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "flex-start",
+                      cursor: "pointer",
                       transition: "0.2s",
-                    },
-                    mt: 1,
-                    p: 3,
-                  }}
-                  onClick={() => handleProjectClick(project)}
-                >
-                  <Typography sx={{ color: "#81c784" }} variant="h5">
-                    {project.name}
-                  </Typography>
-                  {project.assignedUsers
-                    .filter((user) => user.email === project.creatorEmail)
-                    .map((user) => (
-                      <Typography key={user.email}>
-                        Creator: {user.name}
-                      </Typography>
-                    ))}
-                </Box>
-              )),
+                      "&:hover": {
+                        backgroundColor: "#264653",
+                        color: "#81c784",
+                        fontWeight: "bold",
+                        transform: "scale(1.02)",
+                        transition: "0.2s",
+                      },
+                      mt: 1,
+                      p: 3,
+                    }}
+                    onClick={() => handleProjectClick(project)}
+                  >
+                    <Typography sx={{ color: "#81c784" }} variant="h5">
+                      {project.name}
+                    </Typography>
+                    {project.assignedUsers
+                      .filter((user) => user.email === project.creatorEmail)
+                      .map((user) => (
+                        <Typography key={user.email}>
+                          Creator: {user.name}
+                        </Typography>
+                      ))}
+                  </Box>
+                ))
+              ) : (
+                <Typography sx={{ ml: 3, mt: 3, mb: 3, color: "orange" }}>
+                  You are not assigned to any of the projects
+                </Typography>
+              ),
             ]}
             <ProjectDetailsModal
               open={openModal}

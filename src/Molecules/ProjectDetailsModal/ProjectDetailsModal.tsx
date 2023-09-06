@@ -66,7 +66,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
       selectedProject &&
       userToDelete.email !== selectedProject.creatorEmail
     ) {
-      removeUserFromProject(selectedProject.id, userToDelete); // Use the removeUserFromProject method
+      removeUserFromProject(selectedProject.id, userToDelete);
     }
   };
 
@@ -124,25 +124,27 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         <>
           <DialogTitle>{selectedProject.name}</DialogTitle>
           <DialogContent>
-            <Typography>Project Capacity</Typography>
             {isProjectCreator && (
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <TextField
-                  value={capacityInputValue}
-                  onChange={handleCapacityInput}
-                  autoComplete="off"
-                  color="warning"
-                  variant="outlined"
-                  size="small"
-                  sx={{ mt: 2, mb: 2, input: { color: "#adb5bd" } }}
-                />
-                <Button
-                  onClick={() =>
-                    handleProjectCapacity(Number(capacityInputValue))
-                  }
-                >
-                  Save
-                </Button>
+              <Box>
+                <Typography>Project Capacity</Typography>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <TextField
+                    value={capacityInputValue}
+                    onChange={handleCapacityInput}
+                    autoComplete="off"
+                    color="warning"
+                    variant="outlined"
+                    size="small"
+                    sx={{ mt: 2, mb: 2, input: { color: "#adb5bd" } }}
+                  />
+                  <Button
+                    onClick={() =>
+                      handleProjectCapacity(Number(capacityInputValue))
+                    }
+                  >
+                    Save
+                  </Button>
+                </Box>
               </Box>
             )}
             <Box sx={{ display: "flex" }}>
@@ -172,40 +174,42 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               </Box>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 {isProjectCreator && (
-                  <Select
-                    size="small"
-                    color="warning"
-                    sx={{ color: "#adb5bd" }}
-                    value={selectedUserToAdd?.email || ""}
-                    onChange={(event) => {
-                      const selectedUser = allUsers.find(
-                        (user) => user.email === event.target.value
-                      );
-                      setSelectedUserToAdd(selectedUser || null);
-                    }}
-                  >
-                    {filteredUsers
-                      .filter(
-                        (user) =>
-                          !selectedProject?.assignedUsers.some(
-                            (u) => u.email === user.email
-                          )
-                      )
-                      .map((user) => (
-                        <MenuItem key={user.email} value={user.email}>
-                          {`${user.name} ${user.surname}`}
-                        </MenuItem>
-                      ))}
-                  </Select>
+                  <Box>
+                    <Select
+                      size="small"
+                      color="warning"
+                      sx={{ color: "#adb5bd" }}
+                      value={selectedUserToAdd?.email || ""}
+                      onChange={(event) => {
+                        const selectedUser = allUsers.find(
+                          (user) => user.email === event.target.value
+                        );
+                        setSelectedUserToAdd(selectedUser || null);
+                      }}
+                    >
+                      {filteredUsers
+                        .filter(
+                          (user) =>
+                            !selectedProject?.assignedUsers.some(
+                              (u) => u.email === user.email
+                            )
+                        )
+                        .map((user) => (
+                          <MenuItem key={user.email} value={user.email}>
+                            {`${user.name} ${user.surname}`}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                    <Button
+                      sx={{ ml: 1 }}
+                      variant="outlined"
+                      color="warning"
+                      onClick={handleAddUserToProject}
+                    >
+                      Add User
+                    </Button>
+                  </Box>
                 )}
-                <Button
-                  sx={{ ml: 1 }}
-                  variant="outlined"
-                  color="warning"
-                  onClick={handleAddUserToProject}
-                >
-                  Add User
-                </Button>
               </Box>
             </Box>
           </DialogContent>
